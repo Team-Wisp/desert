@@ -1,0 +1,16 @@
+# .mega-linter.yml
+extends: recommended
+
+ENABLE_LINTERS:
+  - TYPESCRIPT_ESLINT
+  - JAVASCRIPT_ESLINT
+  - JSON_JSONLINT
+  - YAML_YAMLLINT
+  - MARKDOWN_MARKDOWNLINT
+  - GIT_GIT_DIFF
+
+DISABLE_LINTERS:
+  - COPYPASTE_JSCPD  #turn off duplication checks
+
+# Don't fail build, raise warning 
+FAIL_FAST: false

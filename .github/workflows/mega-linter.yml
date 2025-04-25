@@ -1,0 +1,18 @@
+# .github/workflows/mega-linter.yml
+name: MegaLinter
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  mega-linter:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: MegaLinter
+        uses: oxsecurity/megalinter@v7
+        env:
+          VALIDATE_ALL_CODEBASE: true
