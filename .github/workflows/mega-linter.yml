@@ -1,4 +1,3 @@
-# .github/workflows/mega-linter.yml
 name: MegaLinter
 
 on:

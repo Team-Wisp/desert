@@ -1,4 +1,3 @@
-# .mega-linter.yml
 extends: recommended
 
 ENABLE_LINTERS:
@@ -10,7 +9,6 @@ ENABLE_LINTERS:
   - GIT_GIT_DIFF
 
 DISABLE_LINTERS:
-  - COPYPASTE_JSCPD  #turn off duplication checks
+  - COPYPASTE_JSCPD
 
-# Don't fail build, raise warning 
 FAIL_FAST: false
