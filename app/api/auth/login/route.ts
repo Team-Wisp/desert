@@ -3,6 +3,8 @@ import dbConnect from '@/lib/db';
 import { UserService } from '@/lib/services/UserService';
 import { toUserDTO } from '@/lib/mappers/user.mapper';
 import { hashEmail } from '@/lib/utils/crypto';
+import { signJwt } from '@/lib/utils/jwt';
+import { createSessionCookie } from '@/lib/utils/cookies';
 
 interface LoginRequest {
   email: string;
@@ -36,10 +38,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Incorrect password.' }, { status: 401 });
     }
 
-    // Successful login
-    return NextResponse.json({ message: 'Login successful', user: toUserDTO(user) });
-  } catch (error) {
-    console.error('[LOGIN_ERROR]', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
+    // Create a session for the user
+    const token = signJwt({
+        email: user.email,
+        domain: user.domain,
+        orgType: user.orgType,
+        isVerified: user.isVerified,
+      });
+  
+      const sessionCookie = createSessionCookie(token);
+  
+      const response = NextResponse.json({ message: 'Login successful', user: toUserDTO(user) });
+      response.headers.set('Set-Cookie', sessionCookie);
+      return response;
+  
+    } catch (error) {
+      console.error('[LOGIN_ERROR]', error);
+      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
 }
