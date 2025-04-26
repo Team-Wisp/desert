@@ -1,11 +1,10 @@
-// /app/api/auth/signup/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
-import User from '@/lib/models/User';
-import Organization from '@/lib/models/Organization';
-
-import mongoose from 'mongoose';
+import { UserService } from '@/lib/services/UserService';
+import { OrganizationService } from '@/lib/services/OrganizationService';
+import { OasisService } from '@/lib/services/OasisService';
+import { hashEmail } from '@/lib/utils/crypto';
+import { toUserDTO } from '@/lib/mappers/user.mapper';
 
 interface SignupRequest {
   email: string;
@@ -23,34 +22,26 @@ export async function POST(req: NextRequest) {
     await dbConnect();
 
     const domain = email.split('@')[1].toLowerCase();
-
-    // Verify OTP via Oasis
-    const verifyOtpResp = await fetch(`${process.env.OASIS_URL}/verify-otp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, otp }),
-    });
-
-    const { verified } = await verifyOtpResp.json();
-    if (!verified) {
-      return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 401 });
-    }
+    const emailHash = hashEmail(email);
+    console.log(emailHash)
+    // Verify OTP with Oasis
+    await OasisService.verifyOtp(emailHash, otp);
 
     // Check if user already exists
-    let user = await User.findOne({ email });
-    if (user) {
-      return NextResponse.json({ message: 'User already exists', user });
+    const existingUser = await UserService.getUserByEmail(emailHash);
+    if (existingUser) {
+      return NextResponse.json({ message: 'User already exists', user: toUserDTO(existingUser) });
     }
 
     // Find corresponding organization
-    const organization = await Organization.findOne({ domain });
+    const organization = await OrganizationService.getOrganizationByDomain(domain);
     if (!organization) {
       return NextResponse.json({ error: 'Organization not found. Please verify email first.' }, { status: 400 });
     }
 
     // Create new user
-    user = await User.create({
-      email,
+    const newUser = await UserService.createUser({
+      email: emailHash,  // Store hashed email
       domain,
       organization: organization.name,
       orgType: organization.type,
@@ -58,10 +49,9 @@ export async function POST(req: NextRequest) {
       lastLoginAt: new Date(),
     });
 
-    return NextResponse.json({ message: 'Signup successful', user });
-  } catch (error) {
+    return NextResponse.json({ message: 'Signup successful', user: toUserDTO(newUser) });
+  } catch (error: any) {
     console.error('[SIGNUP_ERROR]', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
-

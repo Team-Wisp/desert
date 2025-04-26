@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
-import User from '@/lib/models/User';
-import bcrypt from 'bcryptjs';
+import { UserService } from '@/lib/services/UserService';
+import { hashEmail } from '@/lib/utils/crypto';
 
 interface SetPasswordRequest {
   email: string;
@@ -18,19 +18,13 @@ export async function POST(req: NextRequest) {
 
     await dbConnect();
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return NextResponse.json({ error: 'User not found.' }, { status: 404 });
-    }
+    const emailHash = hashEmail(email);
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    user.password = hashedPassword;
-    await user.save();
+    await UserService.updateUserPassword({ email: emailHash, password });
 
     return NextResponse.json({ message: 'Password set successfully.' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[SET_PASSWORD_ERROR]', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }

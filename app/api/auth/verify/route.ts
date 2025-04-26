@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { OasisService } from '@/lib/services/OasisService';
 
 interface VerifyRequest {
   email: string;
@@ -12,28 +13,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email is required.' }, { status: 400 });
     }
 
-    // Call Oasis /verify endpoint
-    const verifyResp = await fetch(`${process.env.OASIS_URL}/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await verifyResp.json();
-
-    if (!verifyResp.ok) {
-      return NextResponse.json({ error: data?.error || 'Verification failed.' }, { status: verifyResp.status });
+    const parts = email.split('@');
+    if (parts.length !== 2) {
+      return NextResponse.json({ error: 'Invalid email format.' }, { status: 400 });
     }
+    const domain = parts[1].toLowerCase();
 
-    const { domain, isValid } = data;
-
-    if (!isValid) {
-      return NextResponse.json({ error: 'Invalid or unverified domain.' }, { status: 400 });
-    }
+    const { isValid } = await OasisService.verifyDomain(domain);
 
     return NextResponse.json({ message: 'Email verified successfully.', domain });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[VERIFY_ERROR]', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }

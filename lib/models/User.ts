@@ -4,6 +4,7 @@ import { OrganizationType } from './OrganizationType';
 export interface IUser extends Document {
   email: string;
   password?: string | null;   
+  username?:string,
   domain: string;
   organization: string;
   orgType: OrganizationType;
@@ -17,6 +18,7 @@ const UserSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true },
     password: { type: String, default: null },  
+    username: { type: String, default: null }, 
     domain: { type: String, required: true },
     organization: { type: String, required: true },
     orgType: { type: String, enum: Object.values(OrganizationType), required: true },
