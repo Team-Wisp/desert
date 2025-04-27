@@ -1,3 +1,5 @@
+//endpoint for caching domain & org (using OpenAI)
+
 import { NextRequest, NextResponse } from "next/server";    
 import { enrichDomain } from "@/lib/services/domainEnrichmentService";
 export async function POST(req: NextRequest) {
