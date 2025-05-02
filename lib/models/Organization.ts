@@ -7,6 +7,7 @@ export interface IOrganization extends Document {
   name: string;
   domain: string;
   type: OrganizationType;
+  org_slug: string;
   logoUrl?: string;
   description?: string;
   createdAt: Date;
@@ -18,6 +19,7 @@ const OrganizationSchema = new Schema<IOrganization>(
     name: { type: String, required: true },
     domain: { type: String, required: true, unique: true },
     type: { type: String, enum: Object.values(OrganizationType), required: true },
+    org_slug: { type: String, required: true, unique: true }, // NEW
     logoUrl: { type: String },
     description: { type: String },
   },

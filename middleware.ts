@@ -1,40 +1,47 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { parseSessionCookie } from '@/lib/utils/cookies';
-import { verifyJwt } from '@/lib/utils/jwt';
+import { NextRequest, NextResponse } from 'next/server';
+import { jwtVerify } from 'jose';
 
-// Middleware function
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+const JWT_SECRET = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET!);
 
-  // Only protect certain routes
-  const protectedRoutes = ['/api/posts', '/api/comments'];
+export async function middleware(request: NextRequest) {
+  const url = request.nextUrl;
+  console.log(`🧭 Middleware running for: ${url.pathname}`);
 
-  const isProtected = protectedRoutes.some((path) => pathname.startsWith(path));
-
-  if (!isProtected) {
-    return NextResponse.next();
-  }
-
-  const token = parseSessionCookie(req);
+  const token = request.cookies.get('wisp-token')?.value;
 
   if (!token) {
-    return NextResponse.json({ error: 'Unauthorized - No Token' }, { status: 401 });
+    console.warn("🚫 No wisp-token cookie found. Redirecting to homepage.");
+    return NextResponse.redirect(new URL('/', url));
   }
 
-  const payload = verifyJwt(token);
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
 
-  if (!payload) {
-    return NextResponse.json({ error: 'Unauthorized - Invalid Token' }, { status: 401 });
+    console.log("✅ JWT verified:", {
+      sub: payload.sub,
+      org: payload.org,
+      orgType: payload.orgType,
+    });
+
+    const response = NextResponse.next();
+    response.headers.set('x-user-id', String(payload.sub));
+    response.headers.set('x-org', String(payload.org));
+    response.headers.set('x-org-type', String(payload.orgType));
+
+    return response;
+  } catch (err) {
+    console.error("❌ JWT verification failed:", err);
+    return NextResponse.redirect(new URL('/', url));
   }
-
-  return NextResponse.next();
 }
 
 export const config = {
-    matcher: [
-      '/api/posts/:path*',
-      '/api/comments/:path*',
-    ],
-  };
-  
+  matcher: [
+    '/dashboard',
+    '/dashboard/:path*',
+    '/feed',
+    '/feed/:path*',
+    '/org',
+    '/org/:path*',
+  ],
+};
