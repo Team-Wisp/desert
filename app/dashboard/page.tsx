@@ -2,7 +2,7 @@
 import { headers } from 'next/headers';
 
 export default async function DashboardPage() {
-  const headersList = await headers(); // ✅ called outside render
+  const headersList = await headers(); 
 
   const userId = headersList.get('x-user-id');
   const org = headersList.get('x-org');
