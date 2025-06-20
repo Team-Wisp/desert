@@ -14,7 +14,7 @@ const LandingRight: React.FC<LandingRightProps> = ({
   onLogout,
 }) => {
   return (
-    <div className="w-1/2 flex flex-col justify-center items-center h-full bg-white px-16 space-y-8 min-h-screen">
+    <div className="w-full lg:w-1/2 flex flex-col justify-center items-center h-full bg-white px-8 lg:px-16 space-y-8 min-h-[50vh] lg:min-h-screen">
       {!isLoggedIn ? (
         <>
           <Button onClick={onSignup} variant="primary" size="large">Sign Up</Button>

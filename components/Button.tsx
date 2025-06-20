@@ -5,7 +5,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'medium' | 'large';
 }
 
-const baseStyles = 'rounded-full font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black cursor-pointer';
+const baseStyles = 'rounded-full font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black shadow-sm';
 
 const sizeStyles = {
   medium: 'px-6 py-2 text-base',
@@ -13,8 +13,8 @@ const sizeStyles = {
 };
 
 const variants = {
-  primary: 'bg-white text-black border border-black hover:bg-[#f3f3f3] hover:text-black shadow-sm',
-  secondary: 'bg-black text-white border border-black hover:bg-[#222] hover:text-white shadow-sm',
+  primary: 'bg-black text-white hover:bg-[#222]',
+  secondary: 'bg-white text-black border border-black hover:bg-[#f3f3f3]',
   danger: 'bg-red-500 text-white hover:bg-red-600',
 };
 
@@ -25,7 +25,7 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   return (
-    <button className={`${baseStyles} ${variants[variant]} ${sizeStyles[size]}`} {...props}>
+    <button className={`${baseStyles} ${variants[variant]} ${sizeStyles[size]} cursor-pointer`} {...props}>
       {children}
     </button>
   );

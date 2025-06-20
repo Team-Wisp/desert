@@ -40,7 +40,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen flex bg-[#F5F5F5] text-[#111111]">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#F5F5F5] text-[#111111]">
       <LandingLeft />
       <LandingRight
         isLoggedIn={isLoggedIn}
