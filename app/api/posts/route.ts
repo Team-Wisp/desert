@@ -12,13 +12,14 @@ export async function POST(req: NextRequest) {
     const org = req.headers.get('x-org');
     const orgType = req.headers.get('x-org-type');
     const userName = req.headers.get('x-username') || 'john';
+    const userId = req.headers.get('x-user-id');
 
     // Validate required fields
     if (!postTitle || !postContent || !topic || !subtopic || !org || !orgType || !emailHash) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    // Create the post using the service
+    // Create the post using the service, and update user's posts array
     const post = await PostService.createPost({
       postTitle,
       postContent,
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
       likes: 0,
       views: 0,
       comments: [],
-    });
+    }, userId!);
 
     return NextResponse.json({ post }, { status: 201 });
   } catch (err) {
