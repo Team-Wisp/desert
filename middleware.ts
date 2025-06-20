@@ -59,7 +59,10 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Apply middleware to all routes except static assets and favicon
+// Apply middleware to all routes except static assets and favicon and enrich-domain
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    // Exclude enrich-domain from middleware
+    '/((?!api/enrich-domain|_next/static|_next/image|favicon.ico).*)',
+  ],
 };
