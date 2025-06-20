@@ -37,9 +37,7 @@ const PostForm: React.FC<PostFormProps> = ({ onSubmit, onCancel }) => {
   }
 
   function handleCancel() {
-    if (touched) {
-      onCancel();
-    }
+    onCancel();
   }
 
   function handleTouch() {

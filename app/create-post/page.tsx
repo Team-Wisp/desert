@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import PostForm from "@/components/PostForm";
 import ConfirmModal from "@/components/ConfirmModal";
+import Navbar from "@/components/Navbar";
 
 const CreatePostPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -43,9 +44,15 @@ const CreatePostPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex flex-col items-center justify-center py-8 px-2">
-      <div className="w-full max-w-xl">
-        <h1 className="text-2xl font-bold mb-6 text-center">Create a Post</h1>
+    <div className="min-h-screen bg-[#fafafa] flex flex-col items-center px-2">
+      <Navbar />
+      <div className="w-full max-w-xl mt-8">
+        <h2
+          className="text-4xl font-bold mb-6 text-center tracking-tight"
+          style={{ fontFamily: 'Merriweather, Georgia, serif' }}
+        >
+          Create a Post
+        </h2>
         <PostForm
           onSubmit={handleSubmit}
           onCancel={handleCancel}
