@@ -32,10 +32,20 @@ export async function middleware(request: NextRequest) {
   if (token) {
     try {
       const { payload } = await jwtVerify(token, JWT_SECRET);
+      console.log('Decoded JWT payload:', payload);
       const response = NextResponse.next();
       response.headers.set('x-user-id', String(payload.sub));
       response.headers.set('x-org', String(payload.org));
       response.headers.set('x-org-type', String(payload.orgType));
+      if (payload.userName) response.headers.set('x-username', String(payload.userName));
+      if (payload.emailHash) response.headers.set('x-email-hash', String(payload.emailHash));
+      console.log('Set headers:', {
+        'x-user-id': String(payload.sub),
+        'x-org': String(payload.org),
+        'x-org-type': String(payload.orgType),
+        'x-username': payload.userName,
+        'x-email-hash': payload.emailHash,
+      });
       return response;
     } catch {
       return NextResponse.redirect(new URL('/landing', origin));
@@ -46,5 +56,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
